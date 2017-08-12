@@ -1,0 +1,21 @@
+{
+  "name": "scottzor_markdownsite",
+  "version": "1.0.0",
+  "description": "UI for markdown site.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p UI/",
+    "copy": "gulp"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jquery": "^3.2.11",
+    "@types/showdown": "^1.4.32",
+    "glup": "^1.0.14",
+    "gulp-concat": "^2.6.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^3.0.0",
+    "typescript": "^2.4.2"
+  }
+}
