@@ -55,7 +55,7 @@ class PageCache {
 // that are returned by the API.
 class PageDisplayer {
     private readonly ERR: string = 'Error while fetching data.';
-    private readonly converter: showdown.Converter = new showdown.Converter();
+    private readonly converter: showdown.Converter = new showdown.Converter({ ghCodeBlocks: true });
     private readonly pageCache: PageCache = new PageCache();
     private readonly $content: JQuery = $('#content');
 
