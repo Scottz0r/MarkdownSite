@@ -13,6 +13,12 @@ namespace Scottz0r.MarkdownSite.Tests
 {
     public class FileFetcherService_Tests
     {
+        // These fields are for keeping these tests cross platform friendly, since
+        // the path seperator will be different between *nix and windows.
+        private static readonly char DSC = Path.DirectorySeparatorChar;
+        private static readonly string SLASH_MD = $"{DSC}md";
+        private static readonly string MD_SLASH_TEST_DOT_MD = Path.Combine(SLASH_MD, "test.md");
+
         Mock<IOptions<MdFileOptions>> _options;
         Mock<ILogger<FileFetcherService>> _logger;
 
@@ -21,7 +27,7 @@ namespace Scottz0r.MarkdownSite.Tests
             _options = new Mock<IOptions<MdFileOptions>>();
             _logger = new Mock<ILogger<FileFetcherService>>();
 
-            _options.SetupGet(x => x.Value).Returns(new MdFileOptions { MDSSourceDirectory = "\\md", MDSFileExtension = ".md" });
+            _options.SetupGet(x => x.Value).Returns(new MdFileOptions { MDSSourceDirectory = SLASH_MD, MDSFileExtension = ".md" });
         }
 
         [Fact]
@@ -29,8 +35,8 @@ namespace Scottz0r.MarkdownSite.Tests
         {
             // Arrange
             var ioProxy = new Mock<IIOProxy>();
-            ioProxy.Setup(x => x.GetFiles("\\md")).Returns(new[] { "test.md", "other.md" });
-            ioProxy.Setup(x => x.DirectoryExists("\\md")).Returns(true);
+            ioProxy.Setup(x => x.GetFiles(SLASH_MD)).Returns(new[] { "test.md", "other.md" });
+            ioProxy.Setup(x => x.DirectoryExists(SLASH_MD)).Returns(true);
             var cacheService = new Mock<IFileCacheService>();
             var service = new FileFetcherService(_options.Object, _logger.Object, ioProxy.Object, cacheService.Object);
 
@@ -65,7 +71,7 @@ namespace Scottz0r.MarkdownSite.Tests
             // Arrange
             var cacheService = new Mock<IFileCacheService>();
             var ioProxy = new Mock<IIOProxy>();
-            ioProxy.Setup(x => x.DirectoryExists("\\md")).Returns(false);
+            ioProxy.Setup(x => x.DirectoryExists(SLASH_MD)).Returns(false);
             var service = new FileFetcherService(_options.Object, _logger.Object, ioProxy.Object, cacheService.Object);
 
             // Act
@@ -79,12 +85,12 @@ namespace Scottz0r.MarkdownSite.Tests
         public void It_should_load_and_cache_file()
         {
             // Arrange
-            string filePath = "\\md\\test.md";
+            string filePath = MD_SLASH_TEST_DOT_MD;
             var ioProxy = new Mock<IIOProxy>();
             ioProxy.Setup(x => x.FileExists(filePath)).Returns(true);
             ioProxy.Setup(x => x.GetLastWriteTimeUtc(filePath)).Returns(new DateTime(2017, 1, 1));
             ioProxy.Setup(x => x.ReadAllText(filePath)).Returns("# Test");
-            ioProxy.Setup(x => x.DirectoryExists("\\md")).Returns(true);
+            ioProxy.Setup(x => x.DirectoryExists(SLASH_MD)).Returns(true);
 
             var cacheService = new Mock<IFileCacheService>();
             cacheService.Setup(x => x.HasKey("test")).Returns(false);
@@ -103,11 +109,11 @@ namespace Scottz0r.MarkdownSite.Tests
         public void It_should_read_from_cache()
         {
             // Arrange
-            string filePath = "\\md\\test.md";
+            string filePath = MD_SLASH_TEST_DOT_MD;
             var ioProxy = new Mock<IIOProxy>();
             ioProxy.Setup(x => x.FileExists(filePath)).Returns(true);
             ioProxy.Setup(x => x.GetLastWriteTimeUtc(filePath)).Returns(new DateTime(2017, 1, 1));
-            ioProxy.Setup(x => x.DirectoryExists("\\md")).Returns(true);
+            ioProxy.Setup(x => x.DirectoryExists(SLASH_MD)).Returns(true);
 
             var cacheService = new Mock<IFileCacheService>();
             cacheService.Setup(x => x.HasKey("test")).Returns(true);
@@ -127,12 +133,12 @@ namespace Scottz0r.MarkdownSite.Tests
         public void It_should_recache_file_newer()
         {
             // Arrange
-            string filePath = "\\md\\test.md";
+            string filePath = MD_SLASH_TEST_DOT_MD;
             var ioProxy = new Mock<IIOProxy>();
             ioProxy.Setup(x => x.FileExists(filePath)).Returns(true);
             ioProxy.Setup(x => x.GetLastWriteTimeUtc(filePath)).Returns(new DateTime(2017, 2, 1));
             ioProxy.Setup(x => x.ReadAllText(filePath)).Returns("# New");
-            ioProxy.Setup(x => x.DirectoryExists("\\md")).Returns(true);
+            ioProxy.Setup(x => x.DirectoryExists(SLASH_MD)).Returns(true);
 
             var cacheService = new Mock<IFileCacheService>();
             cacheService.Setup(x => x.HasKey("test")).Returns(true);
@@ -152,12 +158,12 @@ namespace Scottz0r.MarkdownSite.Tests
         public void It_should_return_not_found_file_doesnt_exist()
         {
             // Arrange
-            string filePath = "\\md\\test.md";
+            string filePath = MD_SLASH_TEST_DOT_MD;
             var ioProxy = new Mock<IIOProxy>();
             ioProxy.Setup(x => x.FileExists(filePath)).Returns(false);
             ioProxy.Setup(x => x.GetLastWriteTimeUtc(filePath)).Throws(new FileNotFoundException());
             ioProxy.Setup(x => x.ReadAllText(filePath)).Throws(new FileNotFoundException());
-            ioProxy.Setup(x => x.DirectoryExists("\\md")).Returns(true);
+            ioProxy.Setup(x => x.DirectoryExists(SLASH_MD)).Returns(true);
 
             var cacheService = new Mock<IFileCacheService>();
             var service = new FileFetcherService(_options.Object, _logger.Object, ioProxy.Object, cacheService.Object);
@@ -192,7 +198,7 @@ namespace Scottz0r.MarkdownSite.Tests
             // Arrange
             var cacheService = new Mock<IFileCacheService>();
             var ioProxy = new Mock<IIOProxy>();
-            ioProxy.Setup(x => x.DirectoryExists("\\md")).Returns(false);
+            ioProxy.Setup(x => x.DirectoryExists(SLASH_MD)).Returns(false);
             var service = new FileFetcherService(_options.Object, _logger.Object, ioProxy.Object, cacheService.Object);
 
             // Act
@@ -206,12 +212,12 @@ namespace Scottz0r.MarkdownSite.Tests
         public void It_should_recache_cache_miss()
         {
             // Arrange
-            string filePath = "\\md\\test.md";
+            string filePath = MD_SLASH_TEST_DOT_MD;
             var ioProxy = new Mock<IIOProxy>();
             ioProxy.Setup(x => x.FileExists(filePath)).Returns(true);
             ioProxy.Setup(x => x.GetLastWriteTimeUtc(filePath)).Returns(new DateTime(2017, 1, 1));
             ioProxy.Setup(x => x.ReadAllText(filePath)).Returns("# Test");
-            ioProxy.Setup(x => x.DirectoryExists("\\md")).Returns(true);
+            ioProxy.Setup(x => x.DirectoryExists(SLASH_MD)).Returns(true);
 
             var cacheService = new Mock<IFileCacheService>();
             cacheService.Setup(x => x.HasKey("test")).Returns(true);

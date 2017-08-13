@@ -1,6 +1,11 @@
-declare function page(route: string, callback: (...args: any[]) => any);
-declare function page(name: string);
-declare function page();
+interface PageModule {
+    (): void;
+    (route: string, callback: (...args: any[]) => any): void;
+    (name: string);
+    redirect(name: string);   
+}
+
+declare var page: PageModule;
 
 // Results from file listing.
 interface ListResult {
@@ -62,6 +67,7 @@ class PageDisplayer {
     // Load the given markdown document (by name).
     loadPage = (name: string): void => {
         this.$content.hide();
+
         // Check local cache before making request.
         if (this.pageCache.isPageCached(name)) {
             this.setContent(this.pageCache.readCache(name));
@@ -178,10 +184,24 @@ $(document).ready(() => {
     let pageDisplayer = new PageDisplayer();
     let pageLister = new PageLister();
 
+    // This is some middleware that attempts to rewrite if name ends with ".md" and 
+    // are not a http/s link. This will redirect if it is relative.
+    let relativeRewriter = (ctx, next) => {
+        let name = ctx.params.name;
+        if (/^(?!https?:\/\/).*.md$/.test(name)) {
+            name = name.substring(0, name.length - 3);
+            page.redirect('/' + name);
+            return;
+        } else {
+            next();
+        }
+    }
+
     pageLister.initPages();
 
     // Router setup.
     page('/', () => pageDisplayer.loadPage('index'));
+    page('/:name', relativeRewriter);
     page('/:name', (ctx) => pageDisplayer.loadPage(ctx.params.name));
     page();
 });
