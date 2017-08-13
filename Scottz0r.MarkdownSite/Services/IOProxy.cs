@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace Scottz0r.MarkdownSite.Services
@@ -23,9 +20,14 @@ namespace Scottz0r.MarkdownSite.Services
             return File.ReadAllText(path);
         }
 
-        public bool Exists(string path)
+        public bool FileExists(string path)
         {
             return File.Exists(path);
+        }
+
+        public bool DirectoryExists(string path)
+        {
+            return Directory.Exists(path);
         }
     }
 }

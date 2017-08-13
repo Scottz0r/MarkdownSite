@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Scottz0r.MarkdownSite.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Scottz0r.MarkdownSite
 {
@@ -12,6 +8,7 @@ namespace Scottz0r.MarkdownSite
         public static void AddMarkdownSite(this IServiceCollection svc)
         {
             svc.AddSingleton<IIOProxy, IOProxy>();
+            svc.AddSingleton<IFileCacheService, FileCacheService>();
             svc.AddSingleton<IFileFetcherService, FileFetcherService>();
         }
     }

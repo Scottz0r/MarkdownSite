@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Scottz0r.MarkdownSite.Services
 {
@@ -13,6 +10,8 @@ namespace Scottz0r.MarkdownSite.Services
 
         string ReadAllText(string path);
 
-        bool Exists(string path);
+        bool FileExists(string path);
+
+        bool DirectoryExists(string path);
     }
 }

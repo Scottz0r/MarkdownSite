@@ -29,23 +29,13 @@ namespace Scottz0r.MarkdownSite.Controllers
             try
             {
                 FileFetchResult result = _fileFetcherService.GetFileContent(fileName);
-                if(result.State == FileFetchResult.ResultState.Successful)
+                if(result.IsFound)
                 {
-                    FileDto dto = new FileDto
-                    {
-                        LastModifiedUtc = result.LastModifiedUtc,
-                        Content = result.Content
-                    };
-                    return CustomOk(dto);
-                }
-                else if(result.State == FileFetchResult.ResultState.NotFound)
-                {
-                    return CustomNotFound();
+                    return CustomOk(result.FileData);
                 }
                 else
                 {
-                    _logger.LogError("Error while getting file: " + result.Message);
-                    return CustomInternalServerError(result.Message);
+                    return CustomNotFound();
                 }
             }
             catch(Exception ex)

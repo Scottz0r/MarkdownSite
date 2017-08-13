@@ -2,40 +2,40 @@
 
 namespace Scottz0r.MarkdownSite.Services
 {
-    public class FileFetchResult
+    public struct FileFetchResult
     {
-        public enum ResultState
+        private bool _isFound;
+        private FileData _fileData;
+
+        public bool IsFound { get { return _isFound; } }
+
+        public FileData FileData
         {
-            Successful,
-            NotFound,
-            Exception
+            get
+            {
+                if (!_isFound)
+                {
+                    throw new InvalidOperationException($"{nameof(FileData)} has not been set.");
+                }
+
+                return _fileData;
+            }
         }
 
-        public ResultState State { get; set; }
+        public FileFetchResult(FileData fileData)
+        {
+            _fileData = fileData;
+            _isFound = fileData != null;
+        }
 
-        public string Content { get; set; }
-
-        public DateTime LastModifiedUtc { get; set; }
-
-        public string Message { get; set; }
+        public static implicit operator FileFetchResult(FileData fileData)
+        {
+            return new FileFetchResult(fileData);
+        }
 
         public static FileFetchResult Notfound()
         {
-            return new FileFetchResult
-            {
-                State = ResultState.NotFound,
-                Message = "Not Found"
-            };
-        }
-
-        public static FileFetchResult Successful(string content, DateTime lastModifiedUtc)
-        {
-            return new FileFetchResult
-            {
-                State = ResultState.Successful,
-                Content = content,
-                LastModifiedUtc = lastModifiedUtc
-            };
+            return new FileFetchResult(null);
         }
     }
 }

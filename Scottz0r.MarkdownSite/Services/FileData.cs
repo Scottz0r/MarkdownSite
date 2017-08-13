@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Scottz0r.MarkdownSite.Models
+namespace Scottz0r.MarkdownSite.Services
 {
-    public class FileDto
+    public class FileData
     {
         public string Content { get; set; }
 
