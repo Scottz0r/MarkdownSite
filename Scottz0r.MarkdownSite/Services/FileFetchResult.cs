@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Scottz0r.MarkdownSite.Services
 {
@@ -18,6 +15,8 @@ namespace Scottz0r.MarkdownSite.Services
 
         public string Content { get; set; }
 
+        public DateTime LastModifiedUtc { get; set; }
+
         public string Message { get; set; }
 
         public static FileFetchResult Notfound()
@@ -29,12 +28,13 @@ namespace Scottz0r.MarkdownSite.Services
             };
         }
 
-        public static FileFetchResult Successful(string content)
+        public static FileFetchResult Successful(string content, DateTime lastModifiedUtc)
         {
             return new FileFetchResult
             {
                 State = ResultState.Successful,
-                Content = content
+                Content = content,
+                LastModifiedUtc = lastModifiedUtc
             };
         }
     }

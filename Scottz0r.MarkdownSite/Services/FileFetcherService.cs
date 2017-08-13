@@ -47,7 +47,7 @@ namespace Scottz0r.MarkdownSite.Services
                 {
                     _logger.LogTrace("File has not been modified. Reading content from cache.");
                     string cachedContent = _fileCache[fileName].Content;
-                    return FileFetchResult.Successful(cachedContent);
+                    return FileFetchResult.Successful(cachedContent, lastModified);
                 }
             }
 
@@ -61,7 +61,7 @@ namespace Scottz0r.MarkdownSite.Services
                 Name = fileName
             };
             _fileCache[fileName] = newCacheEntry;
-            return FileFetchResult.Successful(content);
+            return FileFetchResult.Successful(content, lastModified);
         }
 
         public IEnumerable<string> GetFileNames()

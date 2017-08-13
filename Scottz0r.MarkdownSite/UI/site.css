@@ -1,0 +1,24 @@
+body {
+    margin-top: 20px;
+}
+
+.mds-body {
+    margin: auto;
+    max-width: 860px;
+}
+
+.mds-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mds-nav ul > li {
+    display: inline;
+    margin-right: 5px;
+}
+
+.mds-nav a {
+    color: #000;
+    text-decoration: underline;
+}

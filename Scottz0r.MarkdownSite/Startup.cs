@@ -46,15 +46,7 @@ namespace Scottz0r.MarkdownSite
                 app.UseDeveloperExceptionPage();
             }
 
-            app.Use(async (ctx, next) =>
-            {
-                await next();
-                if(ctx.Response.StatusCode == 404 && !ctx.Request.Path.StartsWithSegments("/file"))
-                {
-                    ctx.Request.Path = "/index.html";
-                    await next();
-                }
-            });
+            app.UseMiddleware<SpaMiddleware>();
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseMvc();

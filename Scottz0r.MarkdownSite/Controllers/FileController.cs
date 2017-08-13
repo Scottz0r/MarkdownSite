@@ -13,7 +13,7 @@ namespace Scottz0r.MarkdownSite.Controllers
     [Route("file")]
     public class FileController : Controller
     {
-        private const string TEXT_PLAIN = "text/plain";
+        private const string GENERIC_ERROR_MSG = "Error while processing request.";
         private readonly ILogger _logger;
         private readonly IFileFetcherService _fileFetcherService;
 
@@ -31,22 +31,27 @@ namespace Scottz0r.MarkdownSite.Controllers
                 FileFetchResult result = _fileFetcherService.GetFileContent(fileName);
                 if(result.State == FileFetchResult.ResultState.Successful)
                 {
-                    return Content(result.Content, TEXT_PLAIN);
+                    FileDto dto = new FileDto
+                    {
+                        LastModifiedUtc = result.LastModifiedUtc,
+                        Content = result.Content
+                    };
+                    return CustomOk(dto);
                 }
                 else if(result.State == FileFetchResult.ResultState.NotFound)
                 {
-                    return NotFound();
+                    return CustomNotFound();
                 }
                 else
                 {
                     _logger.LogError("Error while getting file: " + result.Message);
-                    return StatusCode(StatusCodes.Status500InternalServerError);
+                    return CustomInternalServerError(result.Message);
                 }
             }
             catch(Exception ex)
             {
-                _logger.LogError(1, ex, "Error while getting file.");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                _logger.LogError(1, ex, GENERIC_ERROR_MSG);
+                return CustomInternalServerError(GENERIC_ERROR_MSG);
             }
         }
 
@@ -60,13 +65,53 @@ namespace Scottz0r.MarkdownSite.Controllers
                 {
                     Files = files
                 };
-                return Ok(listDto);
+                return CustomOk(listDto);
             }
             catch(Exception ex)
             {
-                _logger.LogError(1, ex, "Error while listing files.");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                _logger.LogError(1, ex, GENERIC_ERROR_MSG);
+                return CustomInternalServerError(GENERIC_ERROR_MSG);
             }
+        }
+
+        private IActionResult CustomOk(object data)
+        {
+            DtoWrapper goodResult = new DtoWrapper
+            {
+                Id = HttpContext.TraceIdentifier,
+                Data = data
+            };
+            return StatusCode(StatusCodes.Status200OK, goodResult);
+        }
+
+        private IActionResult CustomNotFound()
+        {
+            DtoWrapper errorResult = new DtoWrapper
+            {
+                Id = HttpContext.TraceIdentifier,
+                Data = null,
+                Error = new ErrorData
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Not found."
+                }
+            };
+            return StatusCode(StatusCodes.Status404NotFound, errorResult);
+        }
+
+        private IActionResult CustomInternalServerError(string message)
+        {
+            DtoWrapper errorResult = new DtoWrapper
+            {
+                Id = HttpContext.TraceIdentifier,
+                Data = null,
+                Error = new ErrorData
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = message
+                }
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, errorResult);
         }
     }
 }
